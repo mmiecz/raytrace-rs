@@ -37,6 +37,10 @@ impl Vec3 {
             self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0],
         )
     }
+
+    pub fn unit(&self) -> Self {
+        self / self.length()
+    }
 }
 
 //TODO: Move this to macro
@@ -160,5 +164,29 @@ mod tests {
         assert_eq!(v.x(), 0.0);
         assert_eq!(v.y(), 0.5);
         assert_eq!(v.z(), 2.5);
+    }
+
+    #[test]
+    fn test_vec3_length() {
+        let vec = Vec3::new(3.0, 4.0, 5.0);
+        assert_eq!(vec.length(), 50.0_f32.sqrt());
+    }
+
+    #[test]
+    fn test_vec3_dot() {
+        let vec = Vec3::new(1.0, 3.0, -5.0);
+        let vec2 = Vec3::new(4.0, -2.0, -1.0);
+        let result = vec.dot(vec2);
+        assert_eq!(result, 3.0);
+    }
+
+    #[test]
+    fn test_vec3_cross() {
+        let vec = Vec3::new(2.0, 3.0, 4.0);
+        let vec2 = Vec3::new(5.0, 6.0, 7.0);
+        let result = vec.cross(vec2);
+        assert_eq!(result.x(), -3.0);
+        assert_eq!(result.y(), 6.0);
+        assert_eq!(result.z(), -3.0);
     }
 }
