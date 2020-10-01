@@ -1,11 +1,13 @@
-use std::ops::{Add, Sub, AddAssign, SubAssign, Mul, MulAssign, DivAssign};
+use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Copy, Clone, Debug)]
 struct Vec3([f32; 3]);
 
+type Point = Vec3;
+
 impl Vec3 {
     pub fn new(a: f32, b: f32, c: f32) -> Self {
-        Vec3{0: [a,b,c] }
+        Vec3 { 0: [a, b, c] }
     }
     pub fn x(&self) -> f32 {
         self.0[0]
@@ -18,6 +20,23 @@ impl Vec3 {
     pub fn z(&self) -> f32 {
         self.0[2]
     }
+
+    pub fn length(&self) -> f32 {
+        let len_squared = self.0[0] * self.0[0] + self.0[1] * self.0[1] + self.0[2] * self.0[2];
+        len_squared.sqrt()
+    }
+
+    pub fn dot(&self, rhs: Self) -> f32 {
+        self.0[0] * rhs.0[0] + self.0[1] * rhs.0[1] + self.0[2] * rhs.0[2]
+    }
+
+    pub fn cross(&self, rhs: Self) -> Self {
+        Vec3::new(
+            self.0[1] * rhs.0[2] - self.0[2] * rhs.0[1],
+            self.0[2] * rhs.0[0] - self.0[0] * rhs.0[2],
+            self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0],
+        )
+    }
 }
 
 //TODO: Move this to macro
@@ -28,9 +47,11 @@ impl Sub for Vec3 {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Vec3 {
-            0: [self.0[0] - rhs.0[0],
+            0: [
+                self.0[0] - rhs.0[0],
                 self.0[1] - rhs.0[1],
-                self.0[2] - rhs.0[2] ]
+                self.0[2] - rhs.0[2],
+            ],
         }
     }
 }
@@ -48,9 +69,11 @@ impl Add for Vec3 {
 
     fn add(self, rhs: Self) -> Self::Output {
         Vec3 {
-            0: [self.0[0] + rhs.0[0],
+            0: [
+                self.0[0] + rhs.0[0],
                 self.0[1] + rhs.0[1],
-                self.0[2] + rhs.0[2] ]
+                self.0[2] + rhs.0[2],
+            ],
         }
     }
 }
@@ -68,9 +91,7 @@ impl Mul<f32> for Vec3 {
 
     fn mul(self, rhs: f32) -> Self::Output {
         Vec3 {
-            0: [self.0[0] * rhs,
-                self.0[1] * rhs,
-                self.0[2] * rhs ]
+            0: [self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs],
         }
     }
 }
@@ -91,12 +112,11 @@ impl DivAssign<f32> for Vec3 {
     }
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
     use super::Vec3;
+    use crate::vec::Point;
+
     #[test]
     fn test_vec3() {
         let v = Vec3::new(0.0, 1.0, 2.0);
