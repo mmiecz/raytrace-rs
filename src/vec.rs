@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Copy, Clone, Debug)]
 struct Vec3([f32; 3]);
@@ -39,7 +39,7 @@ impl Vec3 {
     }
 
     pub fn unit(&self) -> Self {
-        self / self.length()
+        *self / self.length()
     }
 }
 
@@ -65,6 +65,16 @@ impl SubAssign for Vec3 {
         self.0[0] -= rhs.0[0];
         self.0[1] -= rhs.0[1];
         self.0[2] -= rhs.0[2];
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            0: [-self.0[0], -self.0[1], -self.0[2]],
+        }
     }
 }
 
@@ -108,6 +118,16 @@ impl MulAssign<f32> for Vec3 {
     }
 }
 
+impl Div<f32> for Vec3 {
+    type Output = Self;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        Vec3 {
+            0: [self.0[0] / rhs, self.0[1] / rhs, self.0[2] / rhs],
+        }
+    }
+}
+
 impl DivAssign<f32> for Vec3 {
     fn div_assign(&mut self, rhs: f32) {
         self.0[0] /= rhs;
@@ -137,6 +157,24 @@ mod tests {
         assert_eq!(result.x(), 0.0);
         assert_eq!(result.y(), 2.0);
         assert_eq!(result.z(), 4.0);
+    }
+
+    #[test]
+    fn test_neg() {
+        let v = Vec3::new(-1.0, 1.0, 0.0);
+        let neg_v = -v;
+        assert_eq!(neg_v.x(), 1.0);
+        assert_eq!(neg_v.y(), -1.0);
+        assert_eq!(neg_v.z(), 0.0);
+    }
+
+    #[test]
+    fn test_add_assign() {
+        let mut v = Vec3::new(0.0, 1.0, 2.0);
+        v += Vec3::new(1.0, 1.0, 1.0);
+        assert_eq!(v.x(), 1.0);
+        assert_eq!(v.y(), 2.0);
+        assert_eq!(v.z(), 3.0);
     }
 
     #[test]
