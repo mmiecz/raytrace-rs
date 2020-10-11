@@ -1,9 +1,47 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Copy, Clone, Debug)]
-struct Vec3([f32; 3]);
-
 type Point = Vec3;
+
+pub struct Color {
+    rgb: [u8; 3],
+}
+
+impl Color {
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        Color { rgb: [r, g, b] }
+    }
+
+    pub fn as_array(&self) -> [u8; 3] {
+        self.rgb
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct Ray {
+    origin: Point,
+    dir: Vec3,
+}
+
+impl Ray {
+    pub fn new(origin: Point, dir: Vec3) -> Ray {
+        Ray { origin, dir }
+    }
+
+    pub fn origin(&self) -> Point {
+        self.origin
+    }
+
+    pub fn direction(&self) -> Vec3 {
+        self.dir
+    }
+
+    pub fn at(&self, t: f32) -> Point {
+        self.origin + self.dir * t
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct Vec3([f32; 3]);
 
 impl Vec3 {
     pub fn new(a: f32, b: f32, c: f32) -> Self {
