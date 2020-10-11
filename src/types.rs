@@ -177,14 +177,20 @@ impl DivAssign<f32> for Vec3 {
 #[cfg(test)]
 mod tests {
     use super::Vec3;
-    use crate::vec::Point;
+
+    macro_rules! vec3_compare {
+        ($v:expr, $exp:expr) => {
+            let eps = f32::EPSILON;
+            assert!(($v.x() - $exp[0]).abs() < eps);
+            assert!(($v.y() - $exp[1]).abs() < eps);
+            assert!(($v.z() - $exp[2]).abs() < eps);
+        };
+    }
 
     #[test]
     fn test_vec3() {
         let v = Vec3::new(0.0, 1.0, 2.0);
-        assert_eq!(v.x(), 0.0);
-        assert_eq!(v.y(), 1.0);
-        assert_eq!(v.z(), 2.0);
+        vec3_compare!(v, [0.0, 1.0, 2.0]);
     }
 
     #[test]
@@ -192,60 +198,48 @@ mod tests {
         let v = Vec3::new(0.0, 1.0, 2.0);
         let v2 = Vec3::new(0.0, 1.0, 2.0);
         let result = v + v2;
-        assert_eq!(result.x(), 0.0);
-        assert_eq!(result.y(), 2.0);
-        assert_eq!(result.z(), 4.0);
+        vec3_compare!(result, [0.0, 2.0, 4.0]);
     }
 
     #[test]
     fn test_neg() {
         let v = Vec3::new(-1.0, 1.0, 0.0);
         let neg_v = -v;
-        assert_eq!(neg_v.x(), 1.0);
-        assert_eq!(neg_v.y(), -1.0);
-        assert_eq!(neg_v.z(), 0.0);
+        vec3_compare!(neg_v, [1.0, -1.0, 0.0]);
     }
 
     #[test]
     fn test_add_assign() {
         let mut v = Vec3::new(0.0, 1.0, 2.0);
         v += Vec3::new(1.0, 1.0, 1.0);
-        assert_eq!(v.x(), 1.0);
-        assert_eq!(v.y(), 2.0);
-        assert_eq!(v.z(), 3.0);
+        vec3_compare!(v, [1.0, 2.0, 3.0]);
     }
 
     #[test]
     fn test_mul() {
         let v = Vec3::new(0.0, 1.0, 5.0);
         let v = v * 3.0;
-        assert_eq!(v.x(), 0.0);
-        assert_eq!(v.y(), 3.0);
-        assert_eq!(v.z(), 15.0);
+        vec3_compare!(v, [0.0, 3.0, 15.0]);
     }
 
     #[test]
     fn test_mul_assign() {
         let mut v = Vec3::new(0.0, 1.0, 5.0);
         v *= 3.0;
-        assert_eq!(v.x(), 0.0);
-        assert_eq!(v.y(), 3.0);
-        assert_eq!(v.z(), 15.0);
+        vec3_compare!(v, [0.0, 3.0, 15.0]);
     }
 
     #[test]
     fn test_div_assign() {
         let mut v = Vec3::new(0.0, 1.0, 5.0);
         v /= 2.0;
-        assert_eq!(v.x(), 0.0);
-        assert_eq!(v.y(), 0.5);
-        assert_eq!(v.z(), 2.5);
+        vec3_compare!(v, [0.0, 0.5, 2.5]);
     }
 
     #[test]
     fn test_vec3_length() {
         let vec = Vec3::new(3.0, 4.0, 5.0);
-        assert_eq!(vec.length(), 50.0_f32.sqrt());
+        assert!((vec.length() - 50.0_f32.sqrt()).abs() < f32::EPSILON);
     }
 
     #[test]
@@ -253,7 +247,7 @@ mod tests {
         let vec = Vec3::new(1.0, 3.0, -5.0);
         let vec2 = Vec3::new(4.0, -2.0, -1.0);
         let result = vec.dot(vec2);
-        assert_eq!(result, 3.0);
+        assert!((result - 3.0).abs() < f32::EPSILON);
     }
 
     #[test]
@@ -261,8 +255,6 @@ mod tests {
         let vec = Vec3::new(2.0, 3.0, 4.0);
         let vec2 = Vec3::new(5.0, 6.0, 7.0);
         let result = vec.cross(vec2);
-        assert_eq!(result.x(), -3.0);
-        assert_eq!(result.y(), 6.0);
-        assert_eq!(result.z(), -3.0);
+        vec3_compare!(result, [-3.0, 6.0, -3.0]);
     }
 }
