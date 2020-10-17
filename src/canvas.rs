@@ -12,6 +12,14 @@ impl Canvas {
         Canvas { width, height, pixels: vec![[0, 0, 0]; (width * height) as usize] }
     }
 
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
         //TODO: This conversion is bad; fix this;
         let r = (color.r() * 255.0) as u8;

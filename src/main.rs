@@ -1,17 +1,56 @@
-mod types;
 mod canvas;
+mod types;
 
+use crate::types::{Color, Point, Vec3};
 use canvas::Canvas;
-use crate::types::Color;
 
 const WIDTH: u32 = 512;
 const HEIGHT: u32 = 512;
 
-fn main() {
-    let mut canvas = Canvas::new(512, 512);
-    canvas.set_pixel(128, 128, Color::red());
-    canvas.set_pixel(256, 256, Color::green());
-    canvas.set_pixel(511, 511, Color::blue());
+#[derive(Debug)]
+struct Projectile {
+    position: Point,
+    velocity: Vec3,
+}
 
+struct Environment {
+    gravity: Vec3,
+    wind: Vec3,
+}
+
+fn tick(env: &Environment, proj: &Projectile) -> Projectile {
+    let position = proj.position + proj.velocity;
+    let velocity = proj.velocity + env.gravity + env.wind;
+    Projectile { position, velocity }
+}
+
+fn main() {
+    // let start = Point::new(0.0, 1.0, 0.0);
+    // let v = Vec3::new(1.0, 1.8, 0.0).normalize() * 11.25;
+
+    let mut canvas = Canvas::new(900, 550);
+    let mut projectile = Projectile {
+        position: Point::new(0.0, 10.0, 0.0),
+        velocity: Vec3::new(1.0, 1.8, 0.0).normalize() * 11.25,
+    };
+
+    let env = Environment {
+        gravity: Vec3::new(0.0, -0.1, 0.0),
+        wind: Vec3::new(-0.01, 0.0, 0.0),
+    };
+
+    while projectile.position.x < canvas.width() as f32
+        && projectile.position.y < canvas.height() as f32
+        && projectile.position.x >= 0 as f32
+        && projectile.position.y >= 0 as f32
+    {
+        canvas.set_pixel(
+            projectile.position.x as u32,
+            canvas.height() - projectile.position.y as u32,
+            Color::red(),
+        );
+        projectile = tick(&env, &projectile);
+        println!("pos: {:?}", projectile);
+    }
     canvas.to_file("test_file.png");
 }

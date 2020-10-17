@@ -1,9 +1,9 @@
 use nalgebra as na;
-use std::ops::{Add, Mul, MulAssign};
+use std::ops::{Add, Mul, MulAssign, Neg};
 
-type Vec3 = na::Vector3<f32>;
-type Mat3 = na::Matrix3<f32>;
-type Point = na::Point3<f32>;
+pub type Vec3 = na::Vector3<f32>;
+pub type Mat3 = na::Matrix3<f32>;
+pub type Point = na::Point3<f32>;
 #[derive(Copy, Clone)]
 pub struct Color {
     rgb: Vec3,
