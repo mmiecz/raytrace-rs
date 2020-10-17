@@ -5,7 +5,7 @@ type Vec3 = na::Vector3<f32>;
 type Mat3 = na::Matrix3<f32>;
 type Point = na::Point3<f32>;
 #[derive(Copy, Clone)]
-struct Color {
+pub struct Color {
     rgb: Vec3,
 }
 
@@ -24,6 +24,28 @@ impl Color {
 
     pub fn b(&self) -> f32 {
         self.rgb[2]
+    }
+
+    pub fn as_array(&self) -> [f32; 3] {
+        self.rgb.into()
+    }
+
+    pub fn red() -> Color {
+        Color::new(1.0, 0.0, 0.0)
+    }
+
+    pub fn green() -> Color {
+        Color::new(0.0, 1.0, 0.0)
+    }
+
+    pub fn blue() -> Color {
+        Color::new(0.0, 0.0, 1.0)
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Color::new(0.0, 0.0, 0.0)
     }
 }
 
