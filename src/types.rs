@@ -1,9 +1,69 @@
 use nalgebra as na;
-use std::ops::Neg;
+use std::ops::{Add, Mul, MulAssign};
 
 type Vec3 = na::Vector3<f32>;
 type Mat3 = na::Matrix3<f32>;
 type Point = na::Point3<f32>;
+#[derive(Copy, Clone)]
+struct Color {
+    rgb: Vec3,
+}
+
+impl Color {
+    pub fn new(r: f32, g: f32, b: f32) -> Self {
+        Color{ rgb: Vec3::new(r, g, b)}
+    }
+
+    pub fn r(&self) -> f32 {
+        self.rgb[0]
+    }
+
+    pub fn g(&self) -> f32 {
+        self.rgb[1]
+    }
+
+    pub fn b(&self) -> f32 {
+        self.rgb[2]
+    }
+}
+
+impl Add for Color {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Color{ rgb : self.rgb + rhs.rgb }
+    }
+}
+
+impl Mul for Color {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Color{ rgb: self.rgb.component_mul(&rhs.rgb) }
+    }
+}
+
+impl MulAssign for Color {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.rgb.component_mul_assign(&rhs.rgb);
+    }
+}
+
+impl Mul<f32> for Color {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Color{ rgb: rhs*self.rgb}
+    }
+}
+
+impl Mul<Color> for f32 {
+    type Output = Color;
+    fn mul(self, rhs: Color)  -> Self::Output {
+        rhs * self
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
