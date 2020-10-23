@@ -3,7 +3,40 @@ use std::ops::{Add, Mul, MulAssign, Neg};
 
 pub type Vec3 = na::Vector3<f32>;
 pub type Mat3 = na::Matrix3<f32>;
-pub type Point = na::Point3<f32>;
+pub type Point3 = na::Point3<f32>;
+pub type Point4 = na::Point4<f32>;
+pub type Vec4 = na::Vector4<f32>;
+pub type Mat4 = na::Matrix4<f32>;
+
+//Pouint in 3D space with w component = 0
+macro_rules! point{
+    ($x:expr, $y:expr, $z:expr) => {
+        Point4::new($x,$y,$z,1.0)
+    }
+}
+
+//3D Vector with w component = 0
+macro_rules! vector{
+    ($x:expr, $y:expr, $z:expr) => {
+        Vec4::new($x,$y,$z,0.0)
+    }
+}
+
+//Translation matrix
+macro_rules! translation{
+    ($x:expr,$y:expr,$z:expr) => {
+        nalgebra::Translation3::new($x,$y,$z).to_homogeneous()
+    }
+}
+
+macro_rules! scaling{
+    ($x:expr,$y:expr,$z:expr) => {
+        nalgebra::Matrix4::new_nonuniform_scaling(&Vec3::new($x,$y,$z))
+    }
+}
+
+
+
 #[derive(Copy, Clone)]
 pub struct Color {
     rgb: Vec3,
@@ -165,6 +198,7 @@ mod tests {
         assert_eq!(v1.dot(&v2), 20.0);
     }
 
+    #[test]
     fn vec3_cross() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(2.0, 3.0, 4.0);
@@ -173,4 +207,37 @@ mod tests {
         assert_eq!(result1, result2.neg());
         vec3_compare!(result1, [-1.0, 2.0, -1.0]);
     }
+
+    #[test]
+    fn translation_point() {
+        let translation = translation!(5.0, -3.0, 2.0);
+        let point = point!(-3.0, 4.0, 5.0);
+        let result = translation * point;
+        vec3_compare!(result, [2.0, 1.0, 7.0]);
+    }
+
+    #[test]
+    fn translation_vector() {
+        let translation = translation!(5.0, 6.0, 7.0);
+        let vec = vector!(1.0, 2.0, 3.0);
+        let result = translation * vec;
+        assert_eq!(result, vec);
+    }
+
+    #[test]
+    fn scaling_point() {
+        let x = scaling!(1.0, 2.0, 3.0);
+        let point = point!(1.0, 2.0, 3.0);
+        let scaled = x * point;
+        assert_eq!(scaled, point!(1.0,4.0,9.0));
+    }
+
+    #[test]
+    fn scaling_vec3() {
+        let scaling = scaling!(1.0, 3.0, 2.0);
+        let vec = Vec4::new(1.0, 2.0, 3.0, 0.0);
+        let scaled = scaling * vec;
+
+    }
+
 }
