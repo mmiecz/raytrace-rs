@@ -35,6 +35,12 @@ macro_rules! scaling{
     }
 }
 
+macro_rules! rotation{
+    ($x:expr,$y:expr,$z:expr) => {
+        nalgebra::Rotation3::new(Vec3::new($x,$y,$z)).to_homogeneous()
+    }
+}
+
 
 
 #[derive(Copy, Clone)]
@@ -238,6 +244,22 @@ mod tests {
         let vec = Vec4::new(1.0, 2.0, 3.0, 0.0);
         let scaled = scaling * vec;
 
+    }
+
+    #[test]
+    fn point_reflection() {
+        let point = point!(2.0, 3.0, 4.0);
+        let reflection = scaling!(-1.0, 1.0, 1.0);
+        let reflected = reflection * point;
+        assert!(reflected == point!(-2.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn point_rotation() {
+        let point = point!(0.0, 1.0, 0.0);
+        let rotation = rotation!(std::f32::consts::PI as f32/4.0, 0.0, 0.0);
+        let rotated = rotation * point;
+        assert!(rotated == point!(0.0, 2.0f32.sqrt()/2.0, 2.0f32.sqrt()/2.0));
     }
 
 }
