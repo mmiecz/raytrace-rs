@@ -41,6 +41,15 @@ macro_rules! rotation{
     }
 }
 
+macro_rules! shear {
+    ($xy:expr,$xz:expr,$yx:expr,$yz:expr,$zx:expr,$zy:expr) => {
+        nalgebra::Matrix4::new( 1.0, $xy, $xz, 0.0,
+                                $yx, 1.0, $yz, 0.0,
+                                $zx, $zy, 1.0, 0.0,
+                                0.0, 0.0, 0.0, 1.0)
+    }
+}
+
 
 
 #[derive(Copy, Clone)]
@@ -129,6 +138,7 @@ impl Mul<Color> for f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::f32::consts::PI;
     macro_rules! vec3_compare {
         ($vec:expr, $exp:expr) => {
             let eps = f32::EPSILON;
@@ -257,9 +267,40 @@ mod tests {
     #[test]
     fn point_rotation() {
         let point = point!(0.0, 1.0, 0.0);
-        let rotation = rotation!(std::f32::consts::PI as f32/4.0, 0.0, 0.0);
+        let rotation = rotation!(PI/4.0, 0.0, 0.0);
         let rotated = rotation * point;
         assert!(rotated == point!(0.0, 2.0f32.sqrt()/2.0, 2.0f32.sqrt()/2.0));
+    }
+
+    //TODO: This is failing due to bad f32 comparison.
+    //Create proper matrix comparison |diff| < eps.
+    #[test]
+    fn point_inverse_rotation() {
+        let point = point!(0.0, 1.0, 0.0);
+        let rotation = rotation!(PI/4.0, 0.0, 0.0);
+        if let Some(inverse) = rotation.try_inverse() {
+            let rotated = inverse * point;
+            assert_eq!(rotated, point!(0.0, 2.0f32.sqrt()/2.0, -2.0f32.sqrt()/2.0));
+        }
+    }
+
+    #[test]
+    fn shear() {
+        let shear = shear!(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let point = point!(2.0, 3.0, 4.0);
+        let sheared = shear * point;
+
+        assert_eq!(sheared, point!(5.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn chained_transformations() {
+        let point = point!(1.0, 0.0, 1.0);
+        let rotation = rotation!(PI/2.0, 0.0, 0.0);
+        let scale = scaling!(5.0, 5.0, 5.0);
+        let translation = translation!(10.0, 5.0, 7.0);
+        let result = translation * scale * rotation * point;
+        assert_eq!(result, point!(15.0, 0.0, 7.0));
     }
 
 }
