@@ -1,5 +1,7 @@
 use nalgebra as na;
 use std::ops::{Add, Mul, MulAssign, Neg};
+use std::collections::HashMap;
+use std::cell::{Cell, RefCell};
 
 pub type Vec3 = na::Vector3<f32>;
 pub type Mat3 = na::Matrix3<f32>;
@@ -49,6 +51,7 @@ macro_rules! shear {
                                 0.0, 0.0, 0.0, 1.0)
     }
 }
+
 
 
 
@@ -302,5 +305,4 @@ mod tests {
         let result = translation * scale * rotation * point;
         assert_eq!(result, point!(15.0, 0.0, 7.0));
     }
-
 }

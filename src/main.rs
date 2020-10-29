@@ -1,8 +1,9 @@
 mod canvas;
 #[macro_use]
-mod types;
+mod math;
+mod objects;
 
-use crate::types::{Point4, Vec4, Mat4, Color, Vec3};
+use crate::math::{Point4, Vec4, Mat4, Color, Vec3};
 
 use canvas::Canvas;
 
@@ -18,7 +19,7 @@ fn main() {
     let mid_x = canvas.width() as f32 / 2.0;
     let mid_y = canvas.height() as f32/ 2.0;
     for t in 0..12 {
-        let point = point!(0.0, mid_y/3.0, 0.0);
+        let point = point!(0.0, mid_y/1.2, 0.0);
         let rotation = rotation!(0.0, 0.0, t as f32 * std::f32::consts::PI / 6.0);
         let point = translation!(mid_x, mid_y, 0.0) * rotation * point;
         let point =

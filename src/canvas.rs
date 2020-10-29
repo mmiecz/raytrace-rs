@@ -1,4 +1,4 @@
-use crate::types::Color;
+use crate::math::Color;
 use std::path::Path;
 
 pub(crate) struct Canvas {
