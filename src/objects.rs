@@ -29,7 +29,7 @@ impl SphereManager {
 }
 
 //Empty sphere that is placed in the center of the screen and has a radius of 1.
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub struct Sphere;
 
 #[derive(Copy, Clone, Debug)]
@@ -47,11 +47,12 @@ impl Ray {
         self.origin + self.direction * t
     }
 }
+
 //Calculate if ray is intersecting with a sphere
 //TODO: For now, sphere is placed in 0,0,0
 //Returns Some(points of intersection) where there is a hit, or None otherwise
-pub fn intersect(ray: &Ray, sphere: &Sphere) -> Option<Vec<f32>> {
-    //Sphere cetnter to the origin.
+pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
+    //Sphere center to the origin.
     let sphere_to_ray = ray.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
     let a = ray.direction.dot(&ray.direction);
     let b = 2.0 * ray.direction.dot(&sphere_to_ray);
@@ -64,11 +65,29 @@ pub fn intersect(ray: &Ray, sphere: &Sphere) -> Option<Vec<f32>> {
         let denom = 2.0 * a;
         let t1 = (-b - sqrt_discriminant) / denom;
         let t2 = (-b + sqrt_discriminant) / denom;
-        let mut res = vec![t1, t2];
-        res.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        Some(res)
+        let mut ts = vec![t1, t2];
+        ts.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        let mut intersections = Intersections::new();
+        for t in ts.iter() {
+            intersections.push(Intersection::new(*t, &sphere));
+        }
+        Some(intersections)
     }
 }
+//Scruct representing collision of ray and an object ( Sphere for now )
+#[derive(Debug, PartialEq)]
+pub struct Intersection<'a> {
+    pub t: f32,
+    pub obj: &'a Sphere,
+}
+
+impl<'a> Intersection<'a> {
+    pub fn new(t: f32, object: &'a Sphere) -> Intersection<'a> {
+        Intersection { t, obj: object }
+    }
+}
+type Intersections<'a> = Vec<Intersection<'a>>;
 
 mod test {
     use super::*;
@@ -100,22 +119,39 @@ mod test {
         let ray = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
         let sm = SphereManager::new();
         let s = sm.create_sphere();
-        let intersecs = intersect(&ray, &sm.get_sphere(s).unwrap());
-        assert_eq!(intersecs.as_ref().map(|res| res.is_empty()), Some(false));
-        assert_eq!(
-            intersecs.as_ref().map(|res| (res[0], res[1])),
-            Some((4.0, 6.0))
-        );
+        let sphere = sm.get_sphere(s).unwrap();
+        let intersects = intersect(&ray, &sphere);
+        assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
+
+        let expected = vec![
+            Intersection::new(4.0, &sphere),
+            Intersection::new(6.0, &sphere),
+        ];
+        assert!(intersects
+            .unwrap()
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a == b));
     }
 
     #[test]
     fn ray_sphere_intersection_tangent() {
         let ray = Ray::new(point!(0.0, 1.0, -5.0), vector!(0.0, 0.0, 1.0));
         let sm = SphereManager::new();
-        let sphere = sm.create_sphere();
-        let inter = intersect(&ray, &sm.get_sphere(sphere).unwrap());
-        assert_eq!(inter.as_ref().map(|res| res.is_empty()), Some(false));
-        assert_eq!(inter.as_ref().map(|res| (res[0], res[1])), Some((5.0, 5.0)));
+        let s = sm.create_sphere();
+        let sphere = sm.get_sphere(s).unwrap();
+        let intersects = intersect(&ray, &sphere);
+        assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
+
+        let expected = vec![
+            Intersection::new(5.0, &sphere),
+            Intersection::new(5.0, &sphere),
+        ];
+        assert!(intersects
+            .unwrap()
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a == b));
     }
 
     #[test]
@@ -123,8 +159,9 @@ mod test {
         let ray = Ray::new(point!(0.0, 2.0, -5.0), vector!(0.0, 0.0, 1.0));
         let sm = SphereManager::new();
         let s = sm.create_sphere();
-        let i = intersect(&ray, &sm.get_sphere(s).unwrap());
-        assert_eq!(i.is_none(), true);
+        let sphere = sm.get_sphere(s).unwrap();
+        let inter = intersect(&ray, &sphere);
+        assert_eq!(inter.is_none(), true);
     }
 
     #[test]
@@ -132,12 +169,19 @@ mod test {
         let ray = Ray::new(point!(0.0, 0.0, 0.0), vector!(0.0, 0.0, 1.0));
         let sm = SphereManager::new();
         let s = sm.create_sphere();
-        let inter = intersect(&ray, &sm.get_sphere(s).unwrap());
-        assert_eq!(inter.as_ref().map(|res| res.is_empty()), Some(false));
-        assert_eq!(
-            inter.as_ref().map(|res| (res[0], res[1])),
-            Some((-1.0, 1.0))
-        );
+        let sphere = sm.get_sphere(s).unwrap();
+        let intersects = intersect(&ray, &sphere);
+        assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
+
+        let expected = vec![
+            Intersection::new(-1.0, &sphere),
+            Intersection::new(1.0, &sphere),
+        ];
+        assert!(intersects
+            .unwrap()
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a == b));
     }
 
     #[test]
@@ -145,11 +189,38 @@ mod test {
         let ray = Ray::new(point!(0.0, 0.0, 5.0), vector!(0.0, 0.0, 1.0));
         let sm = SphereManager::new();
         let s = sm.create_sphere();
-        let inter = intersect(&ray, &sm.get_sphere(s).unwrap());
-        assert_eq!(inter.as_ref().map(|res| res.is_empty()), Some(false));
-        assert_eq!(
-            inter.as_ref().map(|res| (res[0], res[1])),
-            Some((-6.0, -4.0))
-        );
+        let sphere = sm.get_sphere(s).unwrap();
+        let intersects = intersect(&ray, &sphere);
+        assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
+
+        let expected = vec![
+            Intersection::new(-6.0, &sphere),
+            Intersection::new(-4.0, &sphere),
+        ];
+        assert!(intersects
+            .unwrap()
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a == b));
+    }
+
+    #[test]
+    fn new_intersection() {
+        let sm = SphereManager::new();
+        let s = sm.create_sphere();
+        let sphere = sm.get_sphere(s).unwrap();
+        let inter = Intersection::new(3.5, &sphere);
+        assert_eq!(&sphere, inter.obj);
+    }
+    #[test]
+    fn add_new_intersection_to_intersections() {
+        let sm = SphereManager::new();
+        let s = sm.create_sphere();
+        let sphere = sm.get_sphere(s).unwrap();
+        let intersection = Intersection::new(3.5, &sphere);
+
+        let mut intersections = Intersections::new();
+        intersections.push(intersection);
+        assert_eq!(intersections.len(), 1 as usize);
     }
 }

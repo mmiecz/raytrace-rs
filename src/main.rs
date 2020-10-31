@@ -3,7 +3,7 @@ mod canvas;
 mod math;
 mod objects;
 
-use crate::math::{Point4, Vec4, Mat4, Color, Vec3};
+use crate::math::{Color, Mat4, Point4, Vec3, Vec4};
 
 use canvas::Canvas;
 
@@ -17,13 +17,12 @@ fn main() {
     let mut canvas = Canvas::new(900, 550);
 
     let mid_x = canvas.width() as f32 / 2.0;
-    let mid_y = canvas.height() as f32/ 2.0;
+    let mid_y = canvas.height() as f32 / 2.0;
     for t in 0..12 {
-        let point = point!(0.0, mid_y/1.2, 0.0);
+        let point = point!(0.0, mid_y / 1.2, 0.0);
         let rotation = rotation!(0.0, 0.0, t as f32 * std::f32::consts::PI / 6.0);
         let point = translation!(mid_x, mid_y, 0.0) * rotation * point;
-        let point =
-        canvas.set_pixel(point.x as u32, point.y as u32, Color::red());
+        let point = canvas.set_pixel(point.x as u32, point.y as u32, Color::red());
     }
 
     canvas.to_file("test_file.png");
