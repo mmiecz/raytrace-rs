@@ -1,7 +1,9 @@
+use crate::intersection::*;
+use crate::math::*;
 use std::cell::{Cell, RefCell};
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
-use crate::math::*;
 //Internal mutability?
 pub struct SphereManager {
     next_id: i32,
@@ -30,8 +32,8 @@ pub struct Sphere;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Ray {
-    origin: Point4,
-    direction: Vec4,
+    pub origin: Point4,
+    pub direction: Vec4,
 }
 
 impl Ray {
@@ -43,47 +45,6 @@ impl Ray {
         self.origin + self.direction * t
     }
 }
-
-//Calculate if ray is intersecting with a sphere
-//TODO: For now, sphere is placed in 0,0,0
-//Returns Some(points of intersection) where there is a hit, or None otherwise
-pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
-    //Sphere center to the origin.
-    let sphere_to_ray = ray.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
-    let a = ray.direction.dot(&ray.direction);
-    let b = 2.0 * ray.direction.dot(&sphere_to_ray);
-    let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
-    let discriminant = b.powi(2) - 4.0 * a * c;
-    if discriminant < 0.0 {
-        None
-    } else {
-        let sqrt_discriminant = discriminant.sqrt();
-        let denom = 2.0 * a;
-        let t1 = (-b - sqrt_discriminant) / denom;
-        let t2 = (-b + sqrt_discriminant) / denom;
-        let mut ts = vec![t1, t2];
-        ts.sort_by(|a, b| a.partial_cmp(b).unwrap());
-
-        let mut intersections = Intersections::new();
-        for t in ts.iter() {
-            intersections.push(Intersection::new(*t, &sphere));
-        }
-        Some(intersections)
-    }
-}
-//Scruct representing collision of ray and an object ( Sphere for now )
-#[derive(Debug, PartialEq)]
-pub struct Intersection<'a> {
-    pub t: f32,
-    pub obj: &'a Sphere,
-}
-
-impl<'a> Intersection<'a> {
-    pub fn new(t: f32, object: &'a Sphere) -> Intersection<'a> {
-        Intersection { t, obj: object }
-    }
-}
-type Intersections<'a> = Vec<Intersection<'a>>;
 
 mod test {
     use super::*;
@@ -189,23 +150,5 @@ mod test {
             .iter()
             .zip(&expected)
             .all(|(a, b)| a == b));
-    }
-
-    #[test]
-    fn new_intersection() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let inter = Intersection::new(3.5, sphere);
-        assert_eq!(sphere, inter.obj);
-    }
-    #[test]
-    fn add_new_intersection_to_intersections() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let intersection = Intersection::new(3.5, sphere);
-
-        let mut intersections = Intersections::new();
-        intersections.push(intersection);
-        assert_eq!(intersections.len(), 1 as usize);
     }
 }

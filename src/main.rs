@@ -1,6 +1,7 @@
 mod canvas;
 #[macro_use]
 mod math;
+mod intersection;
 mod objects;
 
 use crate::math::{Color, Mat4, Point4, Vec3, Vec4};
