@@ -1,7 +1,5 @@
 use nalgebra as na;
-use std::ops::{Add, Mul, MulAssign, Neg};
-use std::collections::HashMap;
-use std::cell::{Cell, RefCell};
+use std::ops::{Add, Mul, MulAssign};
 
 pub type Vec3 = na::Vector3<f32>;
 pub type Mat3 = na::Matrix3<f32>;
@@ -140,6 +138,7 @@ impl Mul<Color> for f32 {
 
 #[cfg(test)]
 mod tests {
+    use std::ops::Neg;
     use super::*;
     use std::f32::consts::PI;
     macro_rules! vec3_compare {

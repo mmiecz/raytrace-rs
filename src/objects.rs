@@ -1,10 +1,6 @@
-use crate::intersection::*;
 use crate::math::*;
-use std::cell::{Cell, RefCell};
-use std::cmp::Ordering;
 use std::collections::HashMap;
 
-//Internal mutability?
 pub struct SphereManager {
     next_id: i32,
     map: HashMap<i32, Sphere>, // Should Sphere be Rc?
@@ -44,10 +40,18 @@ impl Ray {
     pub fn position(&self, t: f32) -> Point4 {
         self.origin + self.direction * t
     }
+
+    pub fn transform(&self, transform_matrix: &Mat4) -> Ray {
+        Ray {
+            origin: transform_matrix * self.origin,
+            direction: transform_matrix * self.direction,
+        }
+    }
 }
 
 mod test {
     use super::*;
+    use crate::intersection::*;
     #[test]
     fn ray_position() {
         let ray = Ray::new(point!(2.0, 3.0, 4.0), vector!(1.0, 0.0, 0.0));
@@ -62,8 +66,8 @@ mod test {
     #[test]
     fn sphere_creation() {
         let mut manager = SphereManager::new();
-        let (id, sphere1) = manager.create_sphere();
-        let (id2, sphere2) = manager.create_sphere();
+        let (id, _) = manager.create_sphere();
+        let (id2, _) = manager.create_sphere();
         assert_ne!(id, id2);
     }
 
@@ -150,5 +154,23 @@ mod test {
             .iter()
             .zip(&expected)
             .all(|(a, b)| a == b));
+    }
+
+    #[test]
+    fn ray_translation() {
+        let r = Ray::new(point!(1.0, 2.0, 3.0), vector!(0.0, 1.0, 0.0));
+        let m = translation!(3.0, 4.0, 5.0);
+        let result = r.transform(&m);
+        assert_eq!(result.origin, point!(4.0, 6.0, 8.0));
+        assert_eq!(result.direction, vector!(0.0, 1.0, 0.0));
+    }
+
+    #[test]
+    fn ray_scaling() {
+        let r = Ray::new(point!(1.0, 2.0, 3.0), vector!(0.0, 1.0, 0.0));
+        let m = scaling!(2.0, 3.0, 4.0);
+        let result = r.transform(&m);
+        assert_eq!(result.origin, point!(2.0, 6.0, 12.0));
+        assert_eq!(result.direction, vector!(0.0, 3.0, 0.0));
     }
 }

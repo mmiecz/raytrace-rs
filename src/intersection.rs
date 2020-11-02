@@ -2,7 +2,7 @@ use crate::math::*;
 use crate::objects::{Ray, Sphere};
 use std::cmp::Ordering;
 
-//Scruct representing collision of ray and an object ( Sphere for now )
+//Struct representing collision of ray and an object ( Sphere for now )
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: f32,
@@ -31,7 +31,7 @@ impl<'a> Ord for Intersection<'a> {
     }
 }
 
-//TODO: Figure out wether we need to group intersections object-wide.
+//TODO: Figure out whether we need to group intersections object-wide.
 type Intersections<'a> = Vec<Intersection<'a>>;
 
 trait IntersectionInserter<'a> {
@@ -59,7 +59,7 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
     let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
     let discriminant = b.powi(2) - 4.0 * a * c;
     if discriminant < 0.0 {
-        None
+        None // NO HIT
     } else {
         let sqrt_discriminant = discriminant.sqrt();
         let denom = 2.0 * a;
@@ -76,11 +76,20 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
     }
 }
 
+//Return first visible hit from intersections hits.
+pub fn hit<'a>(intersections: &'a Intersections) -> Option<&'a Intersection<'a>> {
+    for intersect in intersections.into_iter() {
+        if intersect.t > 0.0 {
+            return Some(intersect);
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::objects::SphereManager;
-    use std::borrow::BorrowMut;
 
     #[test]
     fn new_intersection() {
@@ -118,5 +127,57 @@ mod test {
         assert_eq!(intersections[1], i3);
         assert_eq!(intersections[2], i0);
         assert_eq!(intersections[3], i1);
+    }
+
+    #[test]
+    fn test_ray_hit() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let i1 = Intersection::new(1.0, sphere);
+        let i2 = Intersection::new(2.0, sphere);
+        let mut inters = Intersections::new();
+        inters.add(i1);
+        inters.add(i2);
+        assert_eq!(Some(&i1), hit(&inters));
+    }
+
+    #[test]
+    fn test_ray_hit_with_negatives() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let i1 = Intersection::new(-1.0, sphere);
+        let i2 = Intersection::new(0.1, sphere);
+        let mut inters = Intersections::new();
+        inters.add(i1);
+        inters.add(i2);
+        assert_eq!(Some(&i2), hit(&inters));
+    }
+
+    #[test]
+    fn test_no_ray_hits() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let i1 = Intersection::new(-1.0, sphere);
+        let i2 = Intersection::new(-0.1, sphere);
+        let mut inters = Intersections::new();
+        inters.add(i1);
+        inters.add(i2);
+        assert_eq!(None, hit(&inters));
+    }
+
+    #[test]
+    fn test_nearest_hit() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let i1 = Intersection::new(5.0, sphere);
+        let i2 = Intersection::new(7.0, sphere);
+        let i3 = Intersection::new(-3.0, sphere);
+        let i4 = Intersection::new(2.0, sphere);
+        let mut inters = Intersections::new();
+        inters.add(i1);
+        inters.add(i2);
+        inters.add(i3);
+        inters.add(i4);
+        assert_eq!(Some(&i4), hit(&inters));
     }
 }
