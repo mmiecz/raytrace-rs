@@ -53,9 +53,15 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
 //Returns Some(points of intersection) where there is a hit, or None otherwise
 pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
     //Sphere center to the origin.
-    let sphere_to_ray = ray.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
-    let a = ray.direction.dot(&ray.direction);
-    let b = 2.0 * ray.direction.dot(&sphere_to_ray);
+    let transformation = sphere
+        .get_transform_matrix()
+        .clone_owned()
+        .try_inverse() // This will panic!
+        .expect("Unable to inverse transformation matrix for intersection!");
+    let ray_transformed = ray.transform(&transformation);
+    let sphere_to_ray = ray_transformed.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
+    let a = ray_transformed.direction.dot(&ray_transformed.direction);
+    let b = 2.0 * ray_transformed.direction.dot(&sphere_to_ray);
     let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
     let discriminant = b.powi(2) - 4.0 * a * c;
     if discriminant < 0.0 {
@@ -70,7 +76,7 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
 
         let mut intersections = Intersections::new();
         for t in ts.iter() {
-            intersections.push(Intersection::new(*t, &sphere));
+            intersections.add(Intersection::new(*t, &sphere));
         }
         Some(intersections)
     }
@@ -179,5 +185,33 @@ mod test {
         inters.add(i3);
         inters.add(i4);
         assert_eq!(Some(&i4), hit(&inters));
+    }
+
+    #[test]
+    fn test_transformed_sphere_ray_hit() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let r = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
+        sphere.transform(&translation!(5.0, 0.0, 0.0));
+        assert_eq!(None, intersect(&r, &sphere));
+    }
+    #[test]
+    fn test_scaled_sphere_ray_hit() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let r = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
+        sphere.transform(&scaling!(2.0, 2.0, 2.0));
+        let intersects = intersect(&r, sphere);
+        assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
+
+        let expected = vec![
+            Intersection::new(3.0, sphere),
+            Intersection::new(7.0, sphere),
+        ];
+        assert!(intersects
+            .unwrap()
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a == b));
     }
 }

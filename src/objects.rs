@@ -13,18 +13,42 @@ impl SphereManager {
             map: HashMap::new(),
         }
     }
-    pub fn create_sphere(&mut self) -> (i32, &Sphere) {
+    pub fn create_sphere(&mut self) -> (i32, &mut Sphere) {
         //There will be parameters passed for sphere properties.
-        self.map.insert(self.next_id, Sphere {});
+        self.map.insert(self.next_id, Sphere::default());
         let sphere_id = self.next_id;
         self.next_id += 1;
-        (sphere_id, self.map.get(&sphere_id).unwrap())
+        (sphere_id, self.map.get_mut(&sphere_id).unwrap())
     }
 }
 
 //Empty sphere that is placed in the center of the screen and has a radius of 1.
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub struct Sphere;
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct Sphere {
+    transformation: Mat4,
+}
+
+impl Default for Sphere {
+    fn default() -> Self {
+        Sphere {
+            transformation: Mat4::identity(),
+        }
+    }
+}
+
+impl Sphere {
+    pub fn new(transformation: Mat4) -> Sphere {
+        Sphere { transformation }
+    }
+
+    pub fn transform(&mut self, transformation_matrix: &Mat4) {
+        self.transformation = *transformation_matrix;
+    }
+
+    pub fn get_transform_matrix<'a>(&'a self) -> &'a Mat4 {
+        &self.transformation
+    }
+}
 
 #[derive(Copy, Clone, Debug)]
 pub struct Ray {
@@ -172,5 +196,21 @@ mod test {
         let result = r.transform(&m);
         assert_eq!(result.origin, point!(2.0, 6.0, 12.0));
         assert_eq!(result.direction, vector!(0.0, 3.0, 0.0));
+    }
+
+    #[test]
+    fn sphere_default_transformation_matrix() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        assert_eq!(sphere.get_transform_matrix(), &Mat4::identity());
+    }
+
+    #[test]
+    fn shpere_translate() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let t = translation!(2.0, 3.0, 4.0);
+        sphere.transform(&t);
+        assert_eq!(&t, sphere.get_transform_matrix());
     }
 }
