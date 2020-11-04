@@ -41,8 +41,9 @@ impl Sphere {
         Sphere { transformation }
     }
 
-    pub fn transform(&mut self, transformation_matrix: &Mat4) {
-        self.transformation = *transformation_matrix;
+    pub fn transform(&mut self, transformation: &Mat4) -> &mut Self {
+        self.transformation *= transformation;
+        self
     }
 
     pub fn get_transform_matrix<'a>(&'a self) -> &'a Mat4 {
@@ -212,5 +213,16 @@ mod test {
         let t = translation!(2.0, 3.0, 4.0);
         sphere.transform(&t);
         assert_eq!(&t, sphere.get_transform_matrix());
+    }
+
+    #[test]
+    fn sphere_chained_translation() {
+        use std::f32::consts::PI;
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        sphere
+            .transform( &rotation!(PI/2.0, 0.0, 0.0))
+            .transform(&scaling!(2.0, 2.0, 2.0))
+            .transform(&translation!(10.0, 10.0, 10.0));
     }
 }

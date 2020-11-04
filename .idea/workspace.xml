@@ -3,6 +3,24 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated />
   </component>
@@ -15,7 +33,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc574dc8-8bda-402f-817d-b00c66b682a4" name="Default Changelist" comment="" />
+    <list default="true" id="cc574dc8-8bda-402f-817d-b00c66b682a4" name="Default Changelist" comment="Raytraced sphere!">
+      <change beforePath="$PROJECT_DIR$/.idea/raytrace-rs.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/raytrace-rs.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/intersection.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/intersection.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/objects.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/objects.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,6 +47,13 @@
   </component>
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -40,10 +71,16 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="MTConfigurable" />
+    <property name="settings.editor.selected.configurable" value="language.rust" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Cargo.Run">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package raytrace-rs --bin raytrace-rs" />
@@ -56,25 +93,44 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <configuration name="Test objects::test::ray_sphere_intersection" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="channel" value="DEFAULT" />
-      <option name="command" value="run" />
+      <option name="command" value="test --package raytrace-rs --bin raytrace-rs objects::test::ray_sphere_intersection -- --exact" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Test objects::test::ray_sphere_intersection_two_points" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="test --package raytrace-rs --bin raytrace-rs objects::test::ray_sphere_intersection_two_points -- --exact" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
       <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Cargo.Test objects::test::ray_sphere_intersection_two_points" />
+        <item itemvalue="Cargo.Test objects::test::ray_sphere_intersection" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="RustProjectSettings">
+    <option name="externalLinter" value="Clippy" />
+    <option name="runExternalLinterOnTheFly" value="true" />
+    <option name="runRustfmtOnSave" value="true" />
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="useRustfmt" value="true" />
+    <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -85,28 +141,142 @@
       <option name="presentableId" value="Default" />
       <updated>1601375553079</updated>
       <workItem from="1601375554269" duration="1616000" />
+      <workItem from="1604140223238" duration="14320000" />
+      <workItem from="1604224445347" duration="8170000" />
+      <workItem from="1604316039648" duration="65000" />
+      <workItem from="1604316112982" duration="57000" />
+      <workItem from="1604316203289" duration="11612000" />
+      <workItem from="1604407352660" duration="1264000" />
+      <workItem from="1604485205878" duration="242000" />
+      <workItem from="1604509412883" duration="60000" />
+      <workItem from="1604509579295" duration="71000" />
+      <workItem from="1604509667246" duration="3254000" />
     </task>
+    <task id="LOCAL-00001" summary="Ray intersections with sphere with tests.">
+      <created>1604155011778</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1604155011779</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Intersections.">
+      <created>1604164416786</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1604164416786</updated>
+    </task>
+    <task id="LOCAL-00003" summary="SphereManager simplification.">
+      <created>1604166019004</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1604166019004</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Ray hit function and tests.&#10;Ray transformation and tests.">
+      <created>1604330462407</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1604330462407</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Raytraced sphere!">
+      <created>1604336948293</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1604336948293</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Ray intersections with sphere with tests." />
+    <MESSAGE value="Intersections." />
+    <MESSAGE value="SphereManager simplification." />
+    <MESSAGE value="Ray hit function and tests.&#10;Ray transformation and tests." />
+    <MESSAGE value="Raytraced sphere!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Raytraced sphere!" />
+  </component>
   <component name="WindowStateProjectService">
-    <state width="3780" height="607" key="GridCell.Tab.0.bottom" timestamp="1601377134687">
-      <screen x="0" y="0" width="3840" height="2108" />
+    <state x="1087" y="891" width="386" height="581" key="#com.intellij.ide.util.MemberChooser" timestamp="1604330701122">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="1087" y="891" width="386" height="581" key="#com.intellij.ide.util.MemberChooser/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604330701122" />
+    <state x="1060" y="930" width="1011" height="736" key="FileChooserDialogImpl" timestamp="1604509468791">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="1060" y="930" width="1011" height="736" key="FileChooserDialogImpl/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604509468791" />
+    <state width="2516" height="496" key="GridCell.Tab.0.bottom" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
     </state>
     <state width="3780" height="607" key="GridCell.Tab.0.bottom/0.0.3840.2108@0.0.3840.2108" timestamp="1601377134687" />
-    <state width="3780" height="607" key="GridCell.Tab.0.center" timestamp="1601377134687">
-      <screen x="0" y="0" width="3840" height="2108" />
+    <state width="2516" height="496" key="GridCell.Tab.0.bottom/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.0.center" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
     </state>
     <state width="3780" height="607" key="GridCell.Tab.0.center/0.0.3840.2108@0.0.3840.2108" timestamp="1601377134687" />
-    <state width="3780" height="607" key="GridCell.Tab.0.left" timestamp="1601377134687">
-      <screen x="0" y="0" width="3840" height="2108" />
+    <state width="2516" height="496" key="GridCell.Tab.0.center/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.0.left" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
     </state>
     <state width="3780" height="607" key="GridCell.Tab.0.left/0.0.3840.2108@0.0.3840.2108" timestamp="1601377134687" />
-    <state width="3780" height="607" key="GridCell.Tab.0.right" timestamp="1601377134687">
-      <screen x="0" y="0" width="3840" height="2108" />
+    <state width="2516" height="496" key="GridCell.Tab.0.left/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.0.right" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
     </state>
     <state width="3780" height="607" key="GridCell.Tab.0.right/0.0.3840.2108@0.0.3840.2108" timestamp="1601377134687" />
+    <state width="2516" height="496" key="GridCell.Tab.0.right/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.1.bottom" timestamp="1604345747399">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state width="2516" height="496" key="GridCell.Tab.1.bottom/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747399" />
+    <state width="2516" height="496" key="GridCell.Tab.1.center" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state width="2516" height="496" key="GridCell.Tab.1.center/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.1.left" timestamp="1604345747398">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state width="2516" height="496" key="GridCell.Tab.1.left/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747398" />
+    <state width="2516" height="496" key="GridCell.Tab.1.right" timestamp="1604345747399">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state width="2516" height="496" key="GridCell.Tab.1.right/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604345747399" />
+    <state x="1080" y="886" key="RollbackChangesDialog" timestamp="1604169275128">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="1080" y="886" key="RollbackChangesDialog/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604169275128" />
+    <state x="760" y="807" width="1037" height="749" key="SettingsEditor" timestamp="1604509592539">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="760" y="807" width="1037" height="749" key="SettingsEditor/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604509592539" />
+    <state x="874" y="895" key="Vcs.Push.Dialog.v2" timestamp="1604336949646">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="874" y="895" key="Vcs.Push.Dialog.v2/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604336949646" />
+    <state x="1051" y="1088" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604408612579">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="1051" y="1088" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604408612579" />
+    <state x="964" y="926" width="892" height="699" key="find.popup" timestamp="1604333097171">
+      <screen x="0" y="480" width="2560" height="1440" />
+    </state>
+    <state x="964" y="926" width="892" height="699" key="find.popup/0.480.2560.1440/2560.0.1080.1920@0.480.2560.1440" timestamp="1604333097171" />
   </component>
 </project>

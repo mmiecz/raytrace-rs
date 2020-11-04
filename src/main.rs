@@ -32,8 +32,10 @@ fn main() {
     let color = Color::red();
     let mut sm = SphereManager::new();
     let (_, sphere) = sm.create_sphere();
-    //TODO: Better API for transformation. Fluent?
-    sphere.transform(&(shear!(0.5, 0.0, 0.0, 0.0, 0.0, 0.0) * scaling!(0.5, 1.0, 1.0)));
+
+    sphere
+        .transform(&scaling!(1.0, 1.0, 1.0))
+        .transform(&shear!(0.5, 0.5, 0.5, 0.0, 0.0, 0.0));
 
     for y in 0..HEIGHT as i32 {
         let world_y = half - pixel_size * y as f32;
@@ -41,12 +43,8 @@ fn main() {
             let world_x = -half + pixel_size * x as f32;
             let position = point!(world_x as f32, world_y as f32, wall_z);
             let ray = Ray::new(ray_origin.clone(), (position - &ray_origin).normalize());
-            // TODO: This is ugly! Figue out and_then.
-            let intersections = intersect(&ray, sphere);
-            if let Some(ints) = intersect(&ray, sphere) {
-                if let Some(hits) = hit(&ints) {
-                    canvas.set_pixel(x as u32, y as u32, color);
-                }
+            if let Some(hit) = intersect(&ray, sphere).as_ref().and_then(hit) {
+                canvas.set_pixel(x as u32, y as u32, color);
             }
         }
     }

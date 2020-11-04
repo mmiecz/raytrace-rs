@@ -60,6 +60,7 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
         .expect("Unable to inverse transformation matrix for intersection!");
     let ray_transformed = ray.transform(&transformation);
     let sphere_to_ray = ray_transformed.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
+
     let a = ray_transformed.direction.dot(&ray_transformed.direction);
     let b = 2.0 * ray_transformed.direction.dot(&sphere_to_ray);
     let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
@@ -86,7 +87,7 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
 pub fn hit<'a>(intersections: &'a Intersections) -> Option<&'a Intersection<'a>> {
     for intersect in intersections.into_iter() {
         if intersect.t > 0.0 {
-            return Some(intersect);
+            return Some(&intersect);
         }
     }
     None
