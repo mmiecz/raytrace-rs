@@ -46,9 +46,13 @@ impl Sphere {
         self
     }
 
-    pub fn get_transform_matrix<'a>(&'a self) -> &'a Mat4 {
+    pub fn get_transform_matrix(&self) -> &Mat4 {
         &self.transformation
     }
+}
+
+pub fn normal_at(sphere: &Sphere, point: &Point4) -> Vec4 {
+    (point - point!(0.0, 0.0, 0.0)).normalize()
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -221,8 +225,34 @@ mod test {
         let mut sm = SphereManager::new();
         let (_, sphere) = sm.create_sphere();
         sphere
-            .transform( &rotation!(PI/2.0, 0.0, 0.0))
+            .transform(&rotation!(PI / 2.0, 0.0, 0.0))
             .transform(&scaling!(2.0, 2.0, 2.0))
             .transform(&translation!(10.0, 10.0, 10.0));
+    }
+
+    #[test]
+    fn normal_at_sphere() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let point = point!(1.0, 0.0, 0.0);
+        let normal = normal_at(sphere, &point);
+        assert_eq!(normal, vector!(1.0, 0.0, 0.0));
+        let point = point!(0.0, 1.0, 0.0);
+        let normal = normal_at(sphere, &point);
+        assert_eq!(normal, Vec4::new(0.0, 1.0, 0.0, 0.0));
+        let sq = 3f32.sqrt() / 3.0;
+        let point = point!(sq, sq, sq);
+        let normal = normal_at(sphere, &point);
+        matrix_eq!(normal, vector!(sq, sq, sq));
+    }
+
+    #[test]
+    fn normal_is_normalized() {
+        let mut sm = SphereManager::new();
+        let (_, sphere) = sm.create_sphere();
+        let sq = 3f32.sqrt() / 3.0;
+        let point = point!(sq, sq, sq);
+        let normal = normal_at(sphere, &point);
+        matrix_eq!(normal, normal.normalize());
     }
 }

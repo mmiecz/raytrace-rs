@@ -9,49 +9,54 @@ pub type Vec4 = na::Vector4<f32>;
 pub type Mat4 = na::Matrix4<f32>;
 
 //Pouint in 3D space with w component = 0
-macro_rules! point{
+macro_rules! point {
     ($x:expr, $y:expr, $z:expr) => {
-        Point4::new($x,$y,$z,1.0)
-    }
+        Point4::new($x, $y, $z, 1.0)
+    };
 }
 
 //3D Vector with w component = 0
-macro_rules! vector{
+macro_rules! vector {
     ($x:expr, $y:expr, $z:expr) => {
-        Vec4::new($x,$y,$z,0.0)
-    }
+        Vec4::new($x, $y, $z, 0.0)
+    };
 }
 
 //Translation matrix
-macro_rules! translation{
+macro_rules! translation {
     ($x:expr,$y:expr,$z:expr) => {
-        nalgebra::Translation3::new($x,$y,$z).to_homogeneous()
-    }
+        nalgebra::Translation3::new($x, $y, $z).to_homogeneous()
+    };
 }
 
-macro_rules! scaling{
+macro_rules! scaling {
     ($x:expr,$y:expr,$z:expr) => {
-        nalgebra::Matrix4::new_nonuniform_scaling(&Vec3::new($x,$y,$z))
-    }
+        nalgebra::Matrix4::new_nonuniform_scaling(&Vec3::new($x, $y, $z))
+    };
 }
 
-macro_rules! rotation{
+macro_rules! rotation {
     ($x:expr,$y:expr,$z:expr) => {
-        nalgebra::Rotation3::new(Vec3::new($x,$y,$z)).to_homogeneous()
-    }
+        nalgebra::Rotation3::new(Vec3::new($x, $y, $z)).to_homogeneous()
+    };
 }
 
 macro_rules! shear {
     ($xy:expr,$xz:expr,$yx:expr,$yz:expr,$zx:expr,$zy:expr) => {
-        nalgebra::Matrix4::new( 1.0, $xy, $xz, 0.0,
-                                $yx, 1.0, $yz, 0.0,
-                                $zx, $zy, 1.0, 0.0,
-                                0.0, 0.0, 0.0, 1.0)
-    }
+        nalgebra::Matrix4::new(
+            1.0, $xy, $xz, 0.0, $yx, 1.0, $yz, 0.0, $zx, $zy, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+        )
+    };
 }
 
-
-
+macro_rules! matrix_eq {
+    ($mat_a:expr, $mat_b:expr) => {
+        $mat_a
+            .iter()
+            .zip($mat_b.iter())
+            .all(|(a, b)| (a - b).abs() < 0.00001);
+    };
+}
 
 #[derive(Copy, Clone)]
 pub struct Color {
@@ -60,7 +65,9 @@ pub struct Color {
 
 impl Color {
     pub fn new(r: f32, g: f32, b: f32) -> Self {
-        Color{ rgb: Vec3::new(r, g, b)}
+        Color {
+            rgb: Vec3::new(r, g, b),
+        }
     }
 
     pub fn r(&self) -> f32 {
@@ -102,7 +109,9 @@ impl Add for Color {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Color{ rgb : self.rgb + rhs.rgb }
+        Color {
+            rgb: self.rgb + rhs.rgb,
+        }
     }
 }
 
@@ -110,7 +119,9 @@ impl Mul for Color {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        Color{ rgb: self.rgb.component_mul(&rhs.rgb) }
+        Color {
+            rgb: self.rgb.component_mul(&rhs.rgb),
+        }
     }
 }
 
@@ -124,23 +135,24 @@ impl Mul<f32> for Color {
     type Output = Self;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        Color{ rgb: rhs*self.rgb}
+        Color {
+            rgb: rhs * self.rgb,
+        }
     }
 }
 
 impl Mul<Color> for f32 {
     type Output = Color;
-    fn mul(self, rhs: Color)  -> Self::Output {
+    fn mul(self, rhs: Color) -> Self::Output {
         rhs * self
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::ops::Neg;
     use super::*;
     use std::f32::consts::PI;
+    use std::ops::Neg;
     macro_rules! vec3_compare {
         ($vec:expr, $exp:expr) => {
             let eps = f32::EPSILON;
@@ -247,7 +259,7 @@ mod tests {
         let x = scaling!(1.0, 2.0, 3.0);
         let point = point!(1.0, 2.0, 3.0);
         let scaled = x * point;
-        assert_eq!(scaled, point!(1.0,4.0,9.0));
+        assert_eq!(scaled, point!(1.0, 4.0, 9.0));
     }
 
     #[test]
@@ -255,7 +267,6 @@ mod tests {
         let scaling = scaling!(1.0, 3.0, 2.0);
         let vec = Vec4::new(1.0, 2.0, 3.0, 0.0);
         let scaled = scaling * vec;
-
     }
 
     #[test]
@@ -269,9 +280,9 @@ mod tests {
     #[test]
     fn point_rotation() {
         let point = point!(0.0, 1.0, 0.0);
-        let rotation = rotation!(PI/4.0, 0.0, 0.0);
+        let rotation = rotation!(PI / 4.0, 0.0, 0.0);
         let rotated = rotation * point;
-        assert!(rotated == point!(0.0, 2.0f32.sqrt()/2.0, 2.0f32.sqrt()/2.0));
+        assert!(rotated == point!(0.0, 2.0f32.sqrt() / 2.0, 2.0f32.sqrt() / 2.0));
     }
 
     //TODO: This is failing due to bad f32 comparison.
@@ -279,11 +290,13 @@ mod tests {
     #[test]
     fn point_inverse_rotation() {
         let point = point!(0.0, 1.0, 0.0);
-        let rotation = rotation!(PI/4.0, 0.0, 0.0);
-        if let Some(inverse) = rotation.try_inverse() {
-            let rotated = inverse * point;
-            assert_eq!(rotated, point!(0.0, 2.0f32.sqrt()/2.0, -2.0f32.sqrt()/2.0));
-        }
+        let rotation = rotation!(PI / 4.0, 0.0, 0.0);
+        let inverse = rotation.try_inverse().unwrap();
+        let rotated = inverse * point;
+        matrix_eq!(
+            rotated,
+            point!(0.0, 2.0f32.sqrt() / 2.0, -2.0f32.sqrt() / 2.0)
+        );
     }
 
     #[test]
@@ -298,7 +311,7 @@ mod tests {
     #[test]
     fn chained_transformations() {
         let point = point!(1.0, 0.0, 1.0);
-        let rotation = rotation!(PI/2.0, 0.0, 0.0);
+        let rotation = rotation!(PI / 2.0, 0.0, 0.0);
         let scale = scaling!(5.0, 5.0, 5.0);
         let translation = translation!(10.0, 5.0, 7.0);
         let result = translation * scale * rotation * point;

@@ -24,10 +24,11 @@ fn main() {
 
     let ray_z = -5.0;
     let ray_origin = point!(0.0, 0.0, ray_z);
+
     let wall_z = 10.0;
-    let _wall_size = 7.0;
-    let pixel_size = _wall_size / WIDTH as f32;
-    let half = _wall_size as f32 / 2.0;
+    let wall_size = 7.0;
+    let pixel_size = wall_size / WIDTH as f32;
+    let half = wall_size as f32 / 2.0;
 
     let color = Color::red();
     let mut sm = SphereManager::new();
