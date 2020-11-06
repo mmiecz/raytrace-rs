@@ -54,7 +54,7 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
 pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
     //Sphere center to the origin.
     let transformation = sphere
-        .get_transform_matrix()
+        .get_transformation()
         .clone_owned()
         .try_inverse() // This will panic!
         .expect("Unable to inverse transformation matrix for intersection!");
@@ -96,32 +96,29 @@ pub fn hit<'a>(intersections: &'a Intersections) -> Option<&'a Intersection<'a>>
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::objects::SphereManager;
+    use crate::objects::SphereBuilder;
 
     #[test]
     fn new_intersection() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let inter = Intersection::new(3.5, sphere);
-        assert_eq!(sphere, inter.obj);
+        let mut sphere = SphereBuilder::new().create();
+        let inter = Intersection::new(3.5, &sphere);
+        assert_eq!(&sphere, inter.obj);
     }
 
     #[test]
     fn intersection_comparison() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
+        let mut sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(1.0, &sphere);
         let i2 = Intersection::new(-5.0, &sphere);
         assert!(i1 > i2);
     }
     #[test]
     fn intersection_order() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let i0 = Intersection::new(5.0, sphere);
-        let i1 = Intersection::new(7.0, sphere);
-        let i2 = Intersection::new(-3.5, sphere);
-        let i3 = Intersection::new(2.0, sphere);
+        let mut sphere = SphereBuilder::new().create();
+        let i0 = Intersection::new(5.0, &sphere);
+        let i1 = Intersection::new(7.0, &sphere);
+        let i2 = Intersection::new(-3.5, &sphere);
+        let i3 = Intersection::new(2.0, &sphere);
 
         let mut intersections = Intersections::new();
         intersections.add(i1);
@@ -138,10 +135,9 @@ mod test {
 
     #[test]
     fn test_ray_hit() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let i1 = Intersection::new(1.0, sphere);
-        let i2 = Intersection::new(2.0, sphere);
+        let mut sphere = SphereBuilder::new().create();
+        let i1 = Intersection::new(1.0, &sphere);
+        let i2 = Intersection::new(2.0, &sphere);
         let mut inters = Intersections::new();
         inters.add(i1);
         inters.add(i2);
@@ -150,10 +146,9 @@ mod test {
 
     #[test]
     fn test_ray_hit_with_negatives() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let i1 = Intersection::new(-1.0, sphere);
-        let i2 = Intersection::new(0.1, sphere);
+        let mut sphere = SphereBuilder::new().create();
+        let i1 = Intersection::new(-1.0, &sphere);
+        let i2 = Intersection::new(0.1, &sphere);
         let mut inters = Intersections::new();
         inters.add(i1);
         inters.add(i2);
@@ -162,10 +157,9 @@ mod test {
 
     #[test]
     fn test_no_ray_hits() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let i1 = Intersection::new(-1.0, sphere);
-        let i2 = Intersection::new(-0.1, sphere);
+        let mut sphere = SphereBuilder::new().create();
+        let i1 = Intersection::new(-1.0, &sphere);
+        let i2 = Intersection::new(-0.1, &sphere);
         let mut inters = Intersections::new();
         inters.add(i1);
         inters.add(i2);
@@ -174,12 +168,11 @@ mod test {
 
     #[test]
     fn test_nearest_hit() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
-        let i1 = Intersection::new(5.0, sphere);
-        let i2 = Intersection::new(7.0, sphere);
-        let i3 = Intersection::new(-3.0, sphere);
-        let i4 = Intersection::new(2.0, sphere);
+        let mut sphere = SphereBuilder::new().create();
+        let i1 = Intersection::new(5.0, &sphere);
+        let i2 = Intersection::new(7.0, &sphere);
+        let i3 = Intersection::new(-3.0, &sphere);
+        let i4 = Intersection::new(2.0, &sphere);
         let mut inters = Intersections::new();
         inters.add(i1);
         inters.add(i2);
@@ -190,24 +183,22 @@ mod test {
 
     #[test]
     fn test_transformed_sphere_ray_hit() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
+        let mut sphere = SphereBuilder::new().create();
         let r = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
         sphere.transform(&translation!(5.0, 0.0, 0.0));
         assert_eq!(None, intersect(&r, &sphere));
     }
     #[test]
     fn test_scaled_sphere_ray_hit() {
-        let mut sm = SphereManager::new();
-        let (_, sphere) = sm.create_sphere();
+        let mut sphere = SphereBuilder::new().create();
         let r = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
         sphere.transform(&scaling!(2.0, 2.0, 2.0));
-        let intersects = intersect(&r, sphere);
+        let intersects = intersect(&r, &sphere);
         assert_eq!(intersects.as_ref().map(|res| res.is_empty()), Some(false));
 
         let expected = vec![
-            Intersection::new(3.0, sphere),
-            Intersection::new(7.0, sphere),
+            Intersection::new(3.0, &sphere),
+            Intersection::new(7.0, &sphere),
         ];
         assert!(intersects
             .unwrap()

@@ -2,8 +2,6 @@ use nalgebra as na;
 use std::ops::{Add, Mul, MulAssign};
 
 pub type Vec3 = na::Vector3<f32>;
-pub type Mat3 = na::Matrix3<f32>;
-pub type Point3 = na::Point3<f32>;
 pub type Point4 = na::Point4<f32>;
 pub type Vec4 = na::Vector4<f32>;
 pub type Mat4 = na::Matrix4<f32>;
@@ -51,14 +49,22 @@ macro_rules! shear {
 
 macro_rules! matrix_eq {
     ($mat_a:expr, $mat_b:expr) => {
-        $mat_a
+        let success = $mat_a
             .iter()
             .zip($mat_b.iter())
             .all(|(a, b)| (a - b).abs() < 0.00001);
+        if !success {
+            panic!(
+                r#"assertion failed: `(left == right)`
+    left: `{:?}`,
+    right: `{:?}`"#,
+                $mat_a, $mat_b
+            );
+        }
     };
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialOrd, PartialEq)]
 pub struct Color {
     rgb: Vec3,
 }

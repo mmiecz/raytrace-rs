@@ -2,12 +2,14 @@ mod canvas;
 #[macro_use]
 mod math;
 mod intersection;
+mod light;
+mod material;
 mod objects;
 
 use crate::math::{Color, Mat4, Point4, Vec3, Vec4};
 
 use crate::intersection::{hit, intersect};
-use crate::objects::{Ray, SphereManager};
+use crate::objects::{Ray, SphereBuilder};
 use canvas::Canvas;
 
 const WIDTH: u32 = 512;
@@ -31,8 +33,7 @@ fn main() {
     let half = wall_size as f32 / 2.0;
 
     let color = Color::red();
-    let mut sm = SphereManager::new();
-    let (_, sphere) = sm.create_sphere();
+    let mut sphere = SphereBuilder::new().create();
 
     sphere
         .transform(&scaling!(1.0, 1.0, 1.0))
@@ -44,7 +45,7 @@ fn main() {
             let world_x = -half + pixel_size * x as f32;
             let position = point!(world_x as f32, world_y as f32, wall_z);
             let ray = Ray::new(ray_origin.clone(), (position - &ray_origin).normalize());
-            if let Some(hit) = intersect(&ray, sphere).as_ref().and_then(hit) {
+            if let Some(hit) = intersect(&ray, &sphere).as_ref().and_then(hit) {
                 canvas.set_pixel(x as u32, y as u32, color);
             }
         }
