@@ -41,7 +41,7 @@ impl SphereBuilder {
 pub struct Sphere {
     id: u32,
     transformation: Mat4,
-    material: Material,
+    pub material: Material,
 }
 
 impl Default for Sphere {
@@ -59,10 +59,11 @@ impl Sphere {
         Sphere {
             id,
             transformation,
-            material: Material::default(),
+            material,
         }
     }
 
+    /// This expects homogeneous matrix
     pub fn transform(&mut self, transformation: &Mat4) -> &mut Self {
         self.transformation *= transformation;
         self
