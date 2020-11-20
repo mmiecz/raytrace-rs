@@ -5,11 +5,12 @@ mod intersection;
 mod light;
 mod material;
 mod objects;
+mod world;
 
 use crate::math::{Color, Mat4, Point4, Vec3, Vec4};
 
 use crate::intersection::{hit, intersect};
-use crate::light::{lighting, PointLight};
+use crate::light::{LightSource, PointLight};
 use crate::material::Material;
 use crate::objects::{normal_at, Ray, SphereBuilder};
 use canvas::Canvas;
@@ -54,7 +55,7 @@ fn main() {
                 let hitpoint = ray.position(hit.t);
                 let normal = normal_at(hit.obj, &hitpoint);
                 let eye = -ray.direction;
-                let color = lighting(&hit.obj.material, &light, &hitpoint, &eye, &normal);
+                let color = light.illuminate(&hit.obj.material, &hitpoint, &eye, &normal);
                 canvas.set_pixel(x as u32, y as u32, color);
             }
         }

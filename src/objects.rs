@@ -3,6 +3,8 @@ use crate::math::*;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
+///TODO: Create Object trait and implement for Sphere
+
 pub struct SphereBuilder {
     transformation: Option<Mat4>,
     material: Option<Material>,
@@ -26,13 +28,16 @@ impl SphereBuilder {
         self
     }
 
-    pub fn create(&self) -> Sphere {
+    pub fn create(&mut self) -> Sphere {
         static COUNTER: AtomicU32 = AtomicU32::new(1);
-        Sphere::new(
+        let result = Sphere::new(
             COUNTER.fetch_add(1, Ordering::Relaxed),
             self.transformation.unwrap_or_else(Mat4::identity),
             self.material.unwrap_or_default(),
-        )
+        );
+        self.transformation = None;
+        self.material = None;
+        result
     }
 }
 
@@ -131,7 +136,7 @@ mod test {
 
     #[test]
     fn sphere_creation() {
-        let sb = SphereBuilder::new();
+        let mut sb = SphereBuilder::new();
         let s1 = sb.create();
         let s2 = sb.create();
         assert_ne!(s1.id, s2.id);

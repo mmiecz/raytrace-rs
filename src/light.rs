@@ -1,8 +1,46 @@
 use crate::material::Material;
 use crate::math::*;
 
-pub fn reflection(ray: &Vec4, normal: &Vec4) -> Vec4 {
+fn reflection(ray: &Vec4, normal: &Vec4) -> Vec4 {
     ray - normal * 2.0 * ray.dot(normal)
+}
+
+pub trait LightSource {
+    fn illuminate(&self, material: &Material, point: &Point4, eyev: &Vec4, normalv: &Vec4)
+        -> Color;
+}
+
+impl LightSource for PointLight {
+    fn illuminate(
+        &self,
+        material: &Material,
+        point: &Point4,
+        eyev: &Vec4,
+        normalv: &Vec4,
+    ) -> Color {
+        let effecticve_color = material.color * self.intensity;
+        let lightv = (self.position - point).normalize();
+
+        let ambient = effecticve_color * material.ambient;
+
+        let mut diffuse = Color::new(0.0, 0.0, 0.0);
+        let mut specular = Color::new(0.0, 0.0, 0.0);
+
+        let light_dot_normal = lightv.dot(normalv);
+        if light_dot_normal < 0.0 {
+            diffuse = Color::new(0.0, 0.0, 0.0);
+            specular = Color::new(0.0, 0.0, 0.0);
+        } else {
+            diffuse = effecticve_color * material.diffuse * light_dot_normal;
+            let reflectv = reflection(&-lightv, &normalv);
+            let reflect_dot_eye = reflectv.dot(&eyev);
+            if reflect_dot_eye > 0.0 {
+                let factor = reflect_dot_eye.powf(material.shininess);
+                specular = self.intensity * material.specular * factor;
+            }
+        }
+        ambient + diffuse + specular
+    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -18,37 +56,6 @@ impl PointLight {
             intensity,
         }
     }
-}
-
-pub fn lighting(
-    material: &Material,
-    light_source: &PointLight,
-    point: &Point4,
-    eyev: &Vec4,
-    normalv: &Vec4,
-) -> Color {
-    let effecticve_color = material.color * light_source.intensity;
-    let lightv = (light_source.position - point).normalize();
-
-    let ambient = effecticve_color * material.ambient;
-
-    let mut diffuse = Color::new(0.0, 0.0, 0.0);
-    let mut specular = Color::new(0.0, 0.0, 0.0);
-
-    let light_dot_normal = lightv.dot(normalv);
-    if light_dot_normal < 0.0 {
-        diffuse = Color::new(0.0, 0.0, 0.0);
-        specular = Color::new(0.0, 0.0, 0.0);
-    } else {
-        diffuse = effecticve_color * material.diffuse * light_dot_normal;
-        let reflectv = reflection(&-lightv, &normalv);
-        let reflect_dot_eye = reflectv.dot(&eyev);
-        if reflect_dot_eye > 0.0 {
-            let factor = reflect_dot_eye.powf(material.shininess);
-            specular = light_source.intensity * material.specular * factor;
-        }
-    }
-    ambient + diffuse + specular
 }
 
 #[cfg(test)]
@@ -80,7 +87,7 @@ mod test {
         let eyev = vector!(0.0, 0.0, -1.0);
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = lighting(&m, &light, &position, &eyev, &normalv);
+        let result = light.illuminate(&m, &position, &eyev, &normalv);
         assert_eq!(result, Color::new(1.9, 1.9, 1.9));
     }
 
@@ -93,7 +100,7 @@ mod test {
         let eyev = vector!(0.0, sq, -sq);
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = lighting(&m, &light, &position, &eyev, &normalv);
+        let result = light.illuminate(&m, &position, &eyev, &normalv);
         assert_eq!(result, Color::new(1.0, 1.0, 1.0));
     }
 
@@ -105,8 +112,8 @@ mod test {
         let eyev = vector!(0.0, 0.0, -1.0);
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = lighting(&m, &light, &position, &eyev, &normalv);
-        assert_eq!(result, Color::new(0.7634, 0.7634, 0.7634));
+        let result = light.illuminate(&m, &position, &eyev, &normalv);
+        assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
     }
 
     #[test]
@@ -118,7 +125,7 @@ mod test {
         let eyev = vector!(0.0, -sq, -sq);
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = lighting(&m, &light, &position, &eyev, &normalv);
+        let result = light.illuminate(&m, &position, &eyev, &normalv);
         assert_eq!(result, Color::new(1.6364, 1.6364, 1.6364));
     }
 
@@ -130,7 +137,7 @@ mod test {
         let eyev = vector!(0.0, 0.0, -1.0);
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 0.0, 10.0), Color::new(1.0, 1.0, 1.0));
-        let result = lighting(&m, &light, &position, &eyev, &normalv);
+        let result = light.illuminate(&m, &position, &eyev, &normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
 }

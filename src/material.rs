@@ -1,5 +1,6 @@
 use crate::math::*;
 
+//TODO: Do Material Builder with defaults.
 #[derive(Debug, Copy, Clone, PartialOrd, PartialEq)]
 pub struct Material {
     pub color: Color,
@@ -21,7 +22,6 @@ impl Default for Material {
     }
 }
 
-//TODO: Implement builder for better params handling.
 impl Material {
     pub fn new(
         color: Color,
@@ -30,7 +30,13 @@ impl Material {
         specular: f32,
         shininess: f32,
     ) -> Material {
-        unimplemented!()
+        Material {
+            color,
+            ambient,
+            diffuse,
+            specular,
+            shininess,
+        }
     }
 
     pub fn default_with_color(color: Color) -> Material {

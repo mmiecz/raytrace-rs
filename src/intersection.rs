@@ -49,7 +49,6 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
 }
 
 //Calculate if ray is intersecting with a sphere
-//TODO: For now, sphere is placed in 0,0,0
 //Returns Some(points of intersection) where there is a hit, or None otherwise
 pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
     //Sphere center to the origin.

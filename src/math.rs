@@ -291,8 +291,6 @@ mod tests {
         assert!(rotated == point!(0.0, 2.0f32.sqrt() / 2.0, 2.0f32.sqrt() / 2.0));
     }
 
-    //TODO: This is failing due to bad f32 comparison.
-    //Create proper matrix comparison |diff| < eps.
     #[test]
     fn point_inverse_rotation() {
         let point = point!(0.0, 1.0, 0.0);
