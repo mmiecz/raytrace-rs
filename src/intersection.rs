@@ -32,7 +32,7 @@ impl<'a> Ord for Intersection<'a> {
 }
 
 //TODO: Figure out whether we need to group intersections object-wide.
-type Intersections<'a> = Vec<Intersection<'a>>;
+pub type Intersections<'a> = Vec<Intersection<'a>>;
 
 trait IntersectionInserter<'a> {
     fn add(&mut self, intersection: Intersection<'a>);
@@ -49,7 +49,6 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
 }
 
 //Calculate if ray is intersecting with a sphere
-//TODO: For now, sphere is placed in 0,0,0
 //Returns Some(points of intersection) where there is a hit, or None otherwise
 pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>> {
     //Sphere center to the origin.
@@ -59,7 +58,7 @@ pub fn intersect<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersections<'a>>
         .try_inverse() // This will panic!
         .expect("Unable to inverse transformation matrix for intersection!");
     let ray_transformed = ray.transform(&transformation);
-    let sphere_to_ray = ray_transformed.origin - point!(0.0, 0.0, 0.0); // point here is fixed for now in 0,0,0
+    let sphere_to_ray = ray_transformed.origin - point!(0.0, 0.0, 0.0);
 
     let a = ray_transformed.direction.dot(&ray_transformed.direction);
     let b = 2.0 * ray_transformed.direction.dot(&sphere_to_ray);
@@ -100,21 +99,21 @@ mod test {
 
     #[test]
     fn new_intersection() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let inter = Intersection::new(3.5, &sphere);
         assert_eq!(&sphere, inter.obj);
     }
 
     #[test]
     fn intersection_comparison() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(1.0, &sphere);
         let i2 = Intersection::new(-5.0, &sphere);
         assert!(i1 > i2);
     }
     #[test]
     fn intersection_order() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i0 = Intersection::new(5.0, &sphere);
         let i1 = Intersection::new(7.0, &sphere);
         let i2 = Intersection::new(-3.5, &sphere);
@@ -135,7 +134,7 @@ mod test {
 
     #[test]
     fn test_ray_hit() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(1.0, &sphere);
         let i2 = Intersection::new(2.0, &sphere);
         let mut inters = Intersections::new();
@@ -146,7 +145,7 @@ mod test {
 
     #[test]
     fn test_ray_hit_with_negatives() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(-1.0, &sphere);
         let i2 = Intersection::new(0.1, &sphere);
         let mut inters = Intersections::new();
@@ -157,7 +156,7 @@ mod test {
 
     #[test]
     fn test_no_ray_hits() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(-1.0, &sphere);
         let i2 = Intersection::new(-0.1, &sphere);
         let mut inters = Intersections::new();
@@ -168,7 +167,7 @@ mod test {
 
     #[test]
     fn test_nearest_hit() {
-        let mut sphere = SphereBuilder::new().create();
+        let sphere = SphereBuilder::new().create();
         let i1 = Intersection::new(5.0, &sphere);
         let i2 = Intersection::new(7.0, &sphere);
         let i3 = Intersection::new(-3.0, &sphere);

@@ -30,7 +30,13 @@ impl Material {
         specular: f32,
         shininess: f32,
     ) -> Material {
-        unimplemented!()
+        Material {
+            color,
+            ambient,
+            diffuse,
+            specular,
+            shininess,
+        }
     }
 
     pub fn default_with_color(color: Color) -> Material {

@@ -5,8 +5,9 @@ mod intersection;
 mod light;
 mod material;
 mod objects;
+mod world;
 
-use crate::math::{Color, Mat4, Point4, Vec3, Vec4};
+use crate::math::{Color, Point4, Vec3};
 
 use crate::intersection::{hit, intersect};
 use crate::light::{lighting, PointLight};
@@ -18,13 +19,7 @@ const WIDTH: u32 = 1024;
 const HEIGHT: u32 = 1024;
 
 fn main() {
-    // let start = Point::new(0.0, 1.0, 0.0);
-    // let v = Vec3::new(1.0, 1.8, 0.0).normalize() * 11.25;
-
     let mut canvas = Canvas::new(WIDTH, HEIGHT);
-
-    let mid_x = canvas.width() as f32 / 2.0;
-    let mid_y = canvas.height() as f32 / 2.0;
 
     let ray_z = -5.0;
     let ray_origin = point!(0.0, 0.0, ray_z);
@@ -38,8 +33,7 @@ fn main() {
 
     let light = PointLight::new(point!(-10.0, 15.0, -5.0), Color::new(1.0, 1.0, 1.0));
 
-    let color = Color::red();
-    let mut sphere = SphereBuilder::new()
+    let sphere = SphereBuilder::new()
         .with_material(material)
         .with_transformation(scaling!(1.1, 1.1, 1.1))
         .create();

@@ -1,6 +1,5 @@
 use crate::material::Material;
 use crate::math::*;
-use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 pub struct SphereBuilder {
@@ -71,9 +70,6 @@ impl Sphere {
 
     pub fn get_transformation(&self) -> &Mat4 {
         &self.transformation
-    }
-    pub fn id(&self) -> u32 {
-        self.id
     }
 }
 
@@ -285,7 +281,7 @@ mod test {
     #[test]
     fn normal_on_scaled_rotated_sphere() {
         let m = scaling!(1.0, 0.5, 1.0) * rotation!(0.0, 0.0, std::f32::consts::PI / 5.0);
-        let mut sphere = SphereBuilder::new().with_transformation(m).create();
+        let sphere = SphereBuilder::new().with_transformation(m).create();
         let sq = 2.0f32.sqrt() / 2.0;
         let normal = normal_at(&sphere, &point!(0.0, sq, -sq));
         matrix_eq!(normal, vector!(0.0, 0.97014, -0.24254));

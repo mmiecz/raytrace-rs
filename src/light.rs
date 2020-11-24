@@ -32,7 +32,7 @@ pub fn lighting(
 
     let ambient = effecticve_color * material.ambient;
 
-    let mut diffuse = Color::new(0.0, 0.0, 0.0);
+    let diffuse;
     let mut specular = Color::new(0.0, 0.0, 0.0);
 
     let light_dot_normal = lightv.dot(normalv);
@@ -106,7 +106,7 @@ mod test {
         let normalv = vector!(0.0, 0.0, -1.0);
         let light = PointLight::new(point!(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let result = lighting(&m, &light, &position, &eyev, &normalv);
-        assert_eq!(result, Color::new(0.7634, 0.7634, 0.7634));
+        assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
     }
 
     #[test]

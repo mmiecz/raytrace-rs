@@ -272,7 +272,7 @@ mod tests {
     fn scaling_vec3() {
         let scaling = scaling!(1.0, 3.0, 2.0);
         let vec = Vec4::new(1.0, 2.0, 3.0, 0.0);
-        let scaled = scaling * vec;
+        let _scaled = scaling * vec;
     }
 
     #[test]

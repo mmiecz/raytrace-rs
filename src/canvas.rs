@@ -1,15 +1,20 @@
 use crate::math::Color;
+use std::error::Error;
 use std::path::Path;
 
 pub(crate) struct Canvas {
     width: u32,
     height: u32,
-    pixels: Vec<[u8;3]>,
+    pixels: Vec<[u8; 3]>,
 }
 
 impl Canvas {
     pub fn new(width: u32, height: u32) -> Self {
-        Canvas { width, height, pixels: vec![[0, 0, 0]; (width * height) as usize] }
+        Canvas {
+            width,
+            height,
+            pixels: vec![[0, 0, 0]; (width * height) as usize],
+        }
     }
 
     pub fn width(&self) -> u32 {
@@ -35,7 +40,7 @@ impl Canvas {
         for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
             //TODO: Check if there is a better way to convert float to byte.
             *pixel = image::Rgb(self.pixels[(y * self.width + x) as usize])
-        };
+        }
         imgbuf.save(path)
     }
 }
