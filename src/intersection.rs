@@ -1,5 +1,5 @@
 use crate::math::*;
-use crate::objects::{Ray, Sphere};
+use crate::objects::{normal_at, Ray, Sphere};
 use std::cmp::Ordering;
 
 //Struct representing collision of ray and an object ( Sphere for now )
@@ -45,6 +45,38 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
             Ok(place) => self.insert(place, intersection),
             Err(place) => self.insert(place, intersection),
         }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct IntersectPrecompute<'a> {
+    t: f32,
+    obj: &'a Sphere,
+    point: Point4,
+    eyev: Vec4,
+    normalv: Vec4,
+    inside: bool,
+}
+
+pub fn precompute<'a>(intersection: &Intersection<'a>, ray: &Ray) -> IntersectPrecompute<'a> {
+    let pos = ray.position(intersection.t);
+    let normalv = normal_at(intersection.obj, &pos);
+    let eyev = -ray.direction;
+    let inside = normalv.dot(&eyev) < 0.0;
+    //Are we inside the object?
+    IntersectPrecompute {
+        t: intersection.t,
+        obj: intersection.obj,
+        point: pos,
+        eyev,
+        normalv: {
+            if inside {
+                -normalv
+            } else {
+                normalv
+            }
+        },
+        inside,
     }
 }
 
@@ -96,6 +128,7 @@ pub fn hit<'a>(intersections: &'a Intersections) -> Option<&'a Intersection<'a>>
 mod test {
     use super::*;
     use crate::objects::SphereBuilder;
+    use std::path::PrefixComponent;
 
     #[test]
     fn new_intersection() {
@@ -204,5 +237,33 @@ mod test {
             .iter()
             .zip(&expected)
             .all(|(a, b)| a == b));
+    }
+
+    #[test]
+    fn test_outside_intesection_precomputation() {
+        let ray = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
+        let shape = Sphere::default();
+        let i = Intersection::new(4.0, &shape);
+        let comps = precompute(&i, &ray);
+        assert_eq!(comps.obj, i.obj);
+        assert_eq!(comps.t, i.t);
+        matrix_eq!(comps.point, point!(0.0, 0.0, -1.0));
+        matrix_eq!(comps.eyev, vector!(0.0, 0.0, -1.0));
+        matrix_eq!(comps.normalv, vector!(0.0, 0.0, -1.0));
+        assert_eq!(comps.inside, false);
+    }
+
+    #[test]
+    fn test_inside_intesection_precomputation() {
+        let ray = Ray::new(point!(0.0, 0.0, 0.0), vector!(0.0, 0.0, 1.0));
+        let shape = Sphere::default();
+        let i = Intersection::new(1.0, &shape);
+        let comps = precompute(&i, &ray);
+        assert_eq!(comps.obj, i.obj);
+        assert_eq!(comps.t, i.t);
+        matrix_eq!(comps.point, point!(0.0, 0.0, 1.0));
+        matrix_eq!(comps.eyev, vector!(0.0, 0.0, -1.0));
+        matrix_eq!(comps.normalv, vector!(0.0, 0.0, -1.0));
+        assert_eq!(comps.inside, true);
     }
 }
