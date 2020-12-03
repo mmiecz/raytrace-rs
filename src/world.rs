@@ -5,16 +5,15 @@ use crate::math::*;
 use crate::objects::{Ray, Sphere};
 use crate::SphereBuilder;
 
-struct World {
+pub struct World {
     objects: Vec<Sphere>, // TODO: Maybe there should be generic Object.
-    light_source: Box<dyn LightSource>, // TODO: Maybe there should be generic LightSource.
+    light_source: Box<dyn LightSource>,
 }
 
 impl Default for World {
     fn default() -> Self {
         let mut sb = SphereBuilder::new();
-        let s1 = sb.with_transformation(scaling!(0.5, 0.5, 0.5)).create();
-        let s2 = sb
+        let s1 = sb
             .with_material(Material::new(
                 Color::new(0.8, 1.0, 0.6),
                 0.1,
@@ -23,6 +22,8 @@ impl Default for World {
                 200.0,
             ))
             .create();
+        let s2 = sb.with_transformation(scaling!(0.5, 0.5, 0.5)).create();
+
         let objects = vec![s1, s2];
         let light = PointLight::new(point!(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         World {
@@ -44,11 +45,19 @@ impl World {
         result.sort();
         result
     }
+
+    pub fn shapes_iter<'a>(&'a self) -> impl Iterator<Item = &'a Sphere> {
+        self.objects.iter()
+    }
+
+    pub fn light_source(&self) -> &Box<dyn LightSource> {
+        &self.light_source
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::intersection::Intersection;
+    use crate::intersection::{Intersection, Precomputation};
     use crate::math::*;
     use crate::objects::Ray;
     use crate::world::World;

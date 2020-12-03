@@ -1,5 +1,7 @@
+use crate::intersection::Precomputation;
 use crate::material::Material;
 use crate::math::*;
+use crate::world::World;
 
 fn reflection(ray: &Vec4, normal: &Vec4) -> Vec4 {
     ray - normal * 2.0 * ray.dot(normal)
@@ -43,6 +45,16 @@ impl LightSource for PointLight {
     }
 }
 
+pub fn shade_hit(world: &World, precomps: &Precomputation) -> Color {
+    let light = world.light_source(); // Single light source supported for now.
+    light.illuminate(
+        &precomps.obj.material,
+        &precomps.point,
+        &precomps.eyev,
+        &precomps.normalv,
+    )
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct PointLight {
     pub position: Point4,
@@ -61,6 +73,8 @@ impl PointLight {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::intersection::{Intersection, Precomputation};
+    use crate::objects::Ray;
 
     #[test]
     fn reflect_45_deg() {
@@ -139,5 +153,21 @@ mod test {
         let light = PointLight::new(point!(0.0, 0.0, 10.0), Color::new(1.0, 1.0, 1.0));
         let result = light.illuminate(&m, &position, &eyev, &normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
+    }
+
+    #[test]
+    fn test_shade_hit() {
+        let w = World::default();
+        let r = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
+        let shape = w
+            .shapes_iter()
+            .next()
+            .expect("Expected some shaped in the world!");
+        let i = Intersection::new(4.0, shape);
+        let precomps = Precomputation::compute(&i, &r);
+        let c = shade_hit(&w, &precomps);
+        assert!((c.r() - 0.38066).abs() < 0.00001);
+        assert!((c.g() - 0.47583).abs() < 0.00001);
+        assert!((c.b() - 0.2855).abs() < 0.00001);
     }
 }

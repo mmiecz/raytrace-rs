@@ -49,34 +49,36 @@ impl<'a> IntersectionInserter<'a> for Intersections<'a> {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct IntersectPrecompute<'a> {
-    t: f32,
-    obj: &'a Sphere,
-    point: Point4,
-    eyev: Vec4,
-    normalv: Vec4,
-    inside: bool,
+pub struct Precomputation<'a> {
+    pub t: f32,
+    pub obj: &'a Sphere,
+    pub point: Point4,
+    pub eyev: Vec4,
+    pub normalv: Vec4,
+    pub inside: bool,
 }
 
-pub fn precompute<'a>(intersection: &Intersection<'a>, ray: &Ray) -> IntersectPrecompute<'a> {
-    let pos = ray.position(intersection.t);
-    let normalv = normal_at(intersection.obj, &pos);
-    let eyev = -ray.direction;
-    let inside = normalv.dot(&eyev) < 0.0;
-    //Are we inside the object?
-    IntersectPrecompute {
-        t: intersection.t,
-        obj: intersection.obj,
-        point: pos,
-        eyev,
-        normalv: {
-            if inside {
-                -normalv
-            } else {
-                normalv
-            }
-        },
-        inside,
+impl<'a> Precomputation<'a> {
+    pub fn compute(intersection: &Intersection<'a>, ray: &Ray) -> Precomputation<'a> {
+        let pos = ray.position(intersection.t);
+        let normalv = normal_at(intersection.obj, &pos);
+        let eyev = -ray.direction;
+        let inside = normalv.dot(&eyev) < 0.0;
+        //Are we inside the object?
+        Precomputation {
+            t: intersection.t,
+            obj: intersection.obj,
+            point: pos,
+            eyev,
+            normalv: {
+                if inside {
+                    -normalv
+                } else {
+                    normalv
+                }
+            },
+            inside,
+        }
     }
 }
 
@@ -244,7 +246,7 @@ mod test {
         let ray = Ray::new(point!(0.0, 0.0, -5.0), vector!(0.0, 0.0, 1.0));
         let shape = Sphere::default();
         let i = Intersection::new(4.0, &shape);
-        let comps = precompute(&i, &ray);
+        let comps = Precomputation::compute(&i, &ray);
         assert_eq!(comps.obj, i.obj);
         assert_eq!(comps.t, i.t);
         matrix_eq!(comps.point, point!(0.0, 0.0, -1.0));
@@ -258,7 +260,7 @@ mod test {
         let ray = Ray::new(point!(0.0, 0.0, 0.0), vector!(0.0, 0.0, 1.0));
         let shape = Sphere::default();
         let i = Intersection::new(1.0, &shape);
-        let comps = precompute(&i, &ray);
+        let comps = Precomputation::compute(&i, &ray);
         assert_eq!(comps.obj, i.obj);
         assert_eq!(comps.t, i.t);
         matrix_eq!(comps.point, point!(0.0, 0.0, 1.0));
